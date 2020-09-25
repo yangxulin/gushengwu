@@ -1,0 +1,55 @@
+conda create -n paddle python=3.7
+conda activate paddle
+
+pip install opencv-python==4.2.0.34 Cython  matplotlib scikit-image numpy==1.17.4 labelme
+
+#安装PaddlePaddle
+pip install paddlepaddle-gpu==1.8.4.post107 -i https://mirror.baidu.com/pypi/simple
+验证：python -c "import paddle; print(paddle.__version__)"
+
+#安装pycocotools
+cd cocoapi/PythonAPI
+python setup.py build_ext install
+
+#安装PaddleDetection
+pip install -r requirements.txt
+测试：python ppdet/modeling/tests/test_architectures.py
+python tools/infer.py -c configs/ppyolo/ppyolo.yml -o weights=ppyolo.pdparams --infer_img=demo/000000014439_640x640.jpg
+
+
+
+#训练faster-rcnn
+1、准备coco数据集
+2、修改faster_rcnn_r50_fpn_1x.yml中的max_iters、num_classes（+1）、base_lr、batch_size
+3、修改faster_fpn_reader.yml中TestReader的anno_path: dataset/coco/annotations/instances_val2017.json
+4、python tools/train.py -c configs/faster_rcnn_r50_fpn_1x.yml
+   python tools/infer.py -c configs/faster_rcnn_r50_fpn_1x.yml -o weights=output/faster_rcnn_r50_fpn_1x/model_final.pdparams --infer_img=00000.bmp
+
+#训练mask-rcnn
+1、准备coco数据集
+2、修改mask_rcnn_r50_fpn_1x.yml中的max_iters、num_classes（+1）、base_lr
+3、修改mask_fpn_reader.yml中TestReader的anno_path: dataset/coco/annotations/instances_val2017.json和batch_size
+4、python tools/train.py -c configs/mask_rcnn_r50_fpn_1x.yml
+   python tools/infer.py -c configs/mask_rcnn_r50_fpn_1x.yml -o weights=output/mask_rcnn_r50_fpn_1x/model_final.pdparams --infer_img=00000.bmp
+
+#训练cascade_rcnn
+1、准备coco数据集
+2、修改cascade_rcnn_r50_fpn_1x.yml中的max_iters、num_classes（+1）、base_lr、batch_size
+3、修改faster_fpn_reader.yml中TestReader的anno_path: dataset/coco/annotations/instances_val2017.json
+4、python tools/train.py -c configs/cascade_rcnn_r50_fpn_1x.yml
+   python tools/infer.py -c configs/cascade_rcnn_r50_fpn_1x.yml -o weights=output/cascade_rcnn_r50_fpn_1x/model_final.pdparams --infer_img=00000.bmp
+   
+#训练cascade_mask_rcnn
+1、准备coco数据集
+2、修改cascade_mask_rcnn_r50_fpn_1x.yml中的max_iters、num_classes（+1）、base_lr
+3、修改mask_fpn_reader.yml中TestReader的anno_path: dataset/coco/annotations/instances_val2017.json和batch_size
+4、python tools/train.py -c configs/cascade_mask_rcnn_r50_fpn_1x.yml
+   python tools/infer.py -c configs/cascade_mask_rcnn_r50_fpn_1x.yml -o weights=output/cascade_mask_rcnn_r50_fpn_1x/model_final.pdparams --infer_img=00000.bmp
+   
+#训练retinanet
+1、准备coco数据集
+2、修改retinanet_r50_fpn_1x.yml中的max_iters、num_classes（+1）、base_lr、batch_size
+3、修改faster_fpn_reader.yml中TestReader的anno_path: dataset/coco/annotations/instances_val2017.json
+4、python tools/train.py -c configs/retinanet_r50_fpn_1x.yml
+   python tools/infer.py -c configs/retinanet_r50_fpn_1x.yml -o weights=output/retinanet_r50_fpn_1x/model_final.pdparams --infer_img=00000.bmp  
+   
